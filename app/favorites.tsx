@@ -3,11 +3,11 @@ import {
   View,
   FlatList,
   Text,
-  SafeAreaView,
+  
 } from "react-native";
 import { Heart } from "lucide-react-native";
 import { useFocusEffect, router } from "expo-router";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   deleteSnippet,
   toggleFavorite,

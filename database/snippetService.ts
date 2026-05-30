@@ -125,36 +125,7 @@ export const searchSnippets = (
   }
 };
 
-// export const updateSnippet = (
-//   id: number,
-//   snippet: Snippet
-// ) => {
-//   try {
-//     db.runSync(
-//       `
-//       UPDATE snippets
-//       SET
-//       title = ?,
-//       code = ?,
-//       language = ?,
-//       tags = ?
-//       WHERE id = ?
-//       `,
-//       [
-//         snippet.title,
-//         snippet.code,
-//         snippet.language,
-//         snippet.tags,
-//         id,
-//       ]
-//     );
 
-//     return true;
-//   } catch (error) {
-//     console.log(error);
-//     return false;
-//   }
-// };
 
 export const getSnippetById = (
   id: number

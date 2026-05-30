@@ -5,9 +5,10 @@ import {
   Button,
   Text,
   ScrollView,
-  SafeAreaView,
+  
   Pressable,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { router, useFocusEffect } from "expo-router";
 import {

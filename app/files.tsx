@@ -4,10 +4,10 @@ import {
   Text,
   FlatList,
   Button,
-  SafeAreaView,
 } from "react-native";
 import { FileText } from "lucide-react-native";
 import { useFocusEffect, router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   createRootFolder,
