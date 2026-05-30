@@ -1,8 +1,13 @@
 
 import { Tabs } from "expo-router";
 import { Home, Heart, Code2, Settings2 } from "lucide-react-native";
+import { useEffect } from "react";
+import { initDatabase } from "../database/schema";
 
 export default function Layout() {
+    useEffect(() => {
+    initDatabase();
+  }, []);
   return (
     <Tabs
       screenOptions={{
