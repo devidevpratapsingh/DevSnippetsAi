@@ -103,16 +103,21 @@ export const toggleFavorite = (
 
 export const searchSnippets = (
   query: string
-) => {
+): Snippet[] => {
   try {
+    const pattern = `%${query}%`;
+
     return db.getAllSync<Snippet>(
       `
       SELECT *
       FROM snippets
       WHERE title LIKE ?
+        OR code LIKE ?
+        OR language LIKE ?
+        OR tags LIKE ?
       ORDER BY id DESC
       `,
-      [`%${query}%`]
+      [pattern, pattern, pattern, pattern]
     );
   } catch (error) {
     console.log(error);

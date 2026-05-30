@@ -1,353 +1,171 @@
-// import React, {
-//   useEffect,
-//   useState,
-// } from "react";
-
-// import {
-//   View,
-//   Text,
-//   Button,
-//   Alert,
-// } from "react-native";
-
-// import {
-//   useLocalSearchParams,
-//   router,
-// } from "expo-router";
-
-// import * as SecureStore from "expo-secure-store";
-
-// import {
-//   getSnippetById,
-//   deleteSnippet,
-// } from "../../database/snippetService";
-
-// import {
-//   saveCodeFile,
-// } from "../../services/fileService";
-
-// import {
-//   explainCode,
-// } from "../../services/aiService";
-
-// import { Snippet } from "../../types/snippet";
-
-// export default function DetailScreen() {
-//   const { id } = useLocalSearchParams();
-
-//   const [snippet, setSnippet] =
-//     useState<Snippet | null>(null);
-
-//   const [aiResponse, setAiResponse] =
-//     useState("");
-
-//   useEffect(() => {
-//     const data = getSnippetById(
-//       Number(id)
-//     );
-
-//     setSnippet(data);
-//   }, [id]);
-
-//   const handleExplain = async () => {
-//     try {
-//       if (!snippet) return;
-
-//       const apiKey =
-//         await SecureStore.getItemAsync(
-//           "OPENROUTER_API_KEY"
-//         );
-
-//       if (!apiKey) {
-//         Alert.alert(
-//           "Missing API Key",
-//           "Please save your OpenRouter API key in Settings."
-//         );
-//         return;
-//       }
-
-//      const result =
-//         await explainCode(
-//           snippet.code
-//         );
-
-//       setAiResponse(result);
-//     } catch (error) {
-//       console.log(error);
-
-//       Alert.alert(
-//         "Error",
-//         "Failed to explain code."
-//       );
-//     }
-//   };
-
-//   if (!snippet) {
-//     return <Text>Loading...</Text>;
-//   }
-
-//   return (
-//     <View
-//       style={{
-//         flex: 1,
-//         padding: 20,
-//       }}
-//     >
-//       <Text
-//         style={{
-//           fontSize: 24,
-//           fontWeight: "bold",
-//         }}
-//       >
-//         {snippet.title}
-//       </Text>
-
-//       <Text>
-//         {snippet.language}
-//       </Text>
-
-//       <Text>
-//         {snippet.code}
-//       </Text>
-
-//       <Button
-//         title="Edit"
-//         onPress={() =>
-//           router.push(
-//             `/edit/${snippet.id}`
-//           )
-//         }
-//       />
-
-//       <Button
-//         title="Export JS"
-//         onPress={async () => {
-//           await saveCodeFile(
-//             `${snippet.title}.js`,
-//             snippet.code
-//           );
-
-//           Alert.alert(
-//             "Success",
-//             "File exported."
-//           );
-//         }}
-//       />
-
-//       <Button
-//         title="Explain Code"
-//         onPress={handleExplain}
-//       />
-
-//       {aiResponse ? (
-//         <Text
-//           style={{
-//             marginTop: 20,
-//           }}
-//         >
-//           {aiResponse}
-//         </Text>
-//       ) : null}
-
-//       <Button
-//         title="Delete"
-//         color="red"
-//         onPress={() => {
-//           deleteSnippet(
-//             snippet.id!
-//           );
-
-//           router.replace("/");
-//         }}
-//       />
-//     </View>
-//   );
-// }
-
-
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   Button,
   Alert,
   ScrollView,
+  Share,
+  SafeAreaView,
 } from "react-native";
-
-import {
-  useLocalSearchParams,
-  router,
-} from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
+import { FileText } from "lucide-react-native";
 
 import {
   getSnippetById,
   deleteSnippet,
 } from "../../database/snippetService";
-
-import {
-  saveCodeFile,
-} from "../../services/fileService";
-
-import {
-  explainCode,
-} from "../../services/aiService";
-
+import { saveCodeFile } from "../../services/fileService";
+import { explainCode } from "../../services/aiService";
 import { Snippet } from "../../types/snippet";
 
 export default function DetailScreen() {
   const { id } = useLocalSearchParams();
-
-  const [snippet, setSnippet] =
-    useState<Snippet | null>(null);
-
-  const [aiResponse, setAiResponse] =
-    useState("");
+  const [snippet, setSnippet] = useState<Snippet | null>(null);
+  const [aiResponse, setAiResponse] = useState("");
 
   useEffect(() => {
-    const data = getSnippetById(
-      Number(id)
-    );
-
+    const data = getSnippetById(Number(id));
     setSnippet(data);
   }, [id]);
 
   const handleExplain = async () => {
     try {
       if (!snippet) return;
-
-      const result =
-        await explainCode(
-          snippet.code
-        );
-
+      const result = await explainCode(snippet.code);
       setAiResponse(result);
     } catch (error) {
       console.log(error);
+      Alert.alert("Error", "Failed to explain code.");
+    }
+  };
 
-      Alert.alert(
-        "Error",
-        "Failed to explain code."
-      );
+  const handleShare = async () => {
+    if (!snippet) return;
+    try {
+      await Share.share({
+        message: `${snippet.title}\n\n${snippet.code}`,
+        title: snippet.title,
+      });
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Unable to share the snippet.");
     }
   };
 
   if (!snippet) {
-    return <Text>Loading...</Text>;
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#020617" }}>
+        <Text style={{ color: "#f8fafc", padding: 20 }}>Loading...</Text>
+      </SafeAreaView>
+    );
   }
 
   return (
     <ScrollView
-      style={{
-        flex: 1,
-        padding: 20,
-      }}
+      style={{ flex: 1, padding: 20, backgroundColor: "#020617" }}
+      contentContainerStyle={{ paddingBottom: 30 }}
     >
-      <Text
+      <View
         style={{
-          fontSize: 24,
-          fontWeight: "bold",
-          marginBottom: 10,
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: 18,
         }}
       >
-        {snippet.title}
-      </Text>
+        <FileText color="#38bdf8" size={28} />
+        <View style={{ marginLeft: 12 }}>
+          <Text
+            style={{
+              color: "#f8fafc",
+              fontSize: 28,
+              fontWeight: "800",
+            }}
+          >
+            {snippet.title}
+          </Text>
+          <Text style={{ color: "#94a3b8", marginTop: 4 }}>
+            {snippet.language} • {snippet.tags || "No tags"}
+          </Text>
+        </View>
+      </View>
 
       <Text
         style={{
-          marginBottom: 10,
+          color: "#94a3b8",
+          marginBottom: 18,
         }}
       >
-        {snippet.language}
+        Added: {new Date(snippet.createdAt).toLocaleDateString()}
       </Text>
-
-      <Text
-        style={{
-          marginBottom: 20,
-        }}
-      >
-        {snippet.code}
-      </Text>
-
-      <Button
-        title="Edit"
-        onPress={() =>
-          router.push(
-            `/edit/${snippet.id}`
-          )
-        }
-      />
 
       <View
         style={{
-          height: 10,
+          padding: 18,
+          borderRadius: 16,
+          backgroundColor: "#111827",
+          borderWidth: 1,
+          borderColor: "#334155",
+          marginBottom: 24,
         }}
-      />
+      >
+        <Text style={{ color: "#f8fafc", lineHeight: 22 }}>
+          {snippet.code}
+        </Text>
+      </View>
 
-      <Button
-        title="Export JS"
-        onPress={async () => {
-          await saveCodeFile(
-            `${snippet.title}.js`,
-            snippet.code
-          );
-
-          Alert.alert(
-            "Success",
-            "File exported successfully."
-          );
-        }}
-      />
-
-      <View
-        style={{
-          height: 10,
-        }}
-      />
-
-      <Button
-        title="Explain Code"
-        onPress={handleExplain}
-      />
+      <View>
+        <Button
+          title="Edit Snippet"
+          onPress={() => router.push(`/edit/${snippet.id}`)}
+        />
+        <View style={{ height: 10 }} />
+        <Button
+          title="Export JS"
+          onPress={async () => {
+            await saveCodeFile(`${snippet.title}.js`, snippet.code);
+            Alert.alert("Success", "File exported successfully.");
+          }}
+        />
+        <View style={{ height: 10 }} />
+        <Button title="Share Snippet" onPress={handleShare} />
+        <View style={{ height: 10 }} />
+        <Button title="Explain Code" onPress={handleExplain} />
+      </View>
 
       {aiResponse ? (
         <View
           style={{
-            marginTop: 20,
+            marginTop: 24,
+            padding: 16,
+            borderRadius: 16,
+            backgroundColor: "#111827",
+            borderWidth: 1,
+            borderColor: "#334155",
           }}
         >
           <Text
             style={{
-              fontWeight: "bold",
+              color: "#f8fafc",
+              fontWeight: "700",
               marginBottom: 10,
             }}
           >
-            AI Explanation:
+            AI Explanation
           </Text>
-
-          <Text>
+          <Text style={{ color: "#cbd5e1", lineHeight: 22 }}>
             {aiResponse}
           </Text>
         </View>
       ) : null}
 
-      <View
-        style={{
-          height: 20,
-        }}
-      />
+      <View style={{ height: 20 }} />
 
       <Button
-        title="Delete"
+        title="Delete Snippet"
         color="red"
         onPress={() => {
-          deleteSnippet(
-            snippet.id!
-          );
-
+          deleteSnippet(snippet.id!);
           router.replace("/");
         }}
       />
