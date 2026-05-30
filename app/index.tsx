@@ -79,6 +79,30 @@ export default function HomeScreen() {
           router.push("/favorites")
         }
       />
+      <Button
+        title="Files"
+        onPress={() =>
+          router.push("/files")
+        }
+      />
+      <Button
+        title="Settings"
+        onPress={() =>
+          router.push("/settings")
+        }
+      />
+      <Button
+        title="AI Generate"
+        onPress={() =>
+          router.push("/generate")
+        }
+      />
+      <Button
+        title="Import File"
+        onPress={() =>
+          router.push("/import")
+        }
+      />
 
       <FlatList
         data={snippets}

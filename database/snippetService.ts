@@ -35,6 +35,22 @@ export const createSnippet = (
   }
 };
 
+export const getFavoriteSnippets =
+  (): Snippet[] => {
+    try {
+      return db.getAllSync<Snippet>(
+        `
+        SELECT *
+        FROM snippets
+        WHERE favorite = 1
+        ORDER BY id DESC
+        `
+      );
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
 export const getAllSnippets = (): Snippet[] => {
   try {
     return db.getAllSync<Snippet>(
@@ -155,6 +171,36 @@ export const getSnippetById = (
   }
 };
 
+// export const updateSnippet = (
+//   id: number,
+//   snippet: Snippet
+// ) => {
+//   try {
+//     db.runSync(
+//       `
+//       UPDATE snippets
+//       SET
+//         title = ?,
+//         code = ?,
+//         language = ?,
+//         tags = ?
+//       WHERE id = ?
+//       `,
+//       [
+//         snippet.title,
+//         snippet.code,
+//         snippet.language,
+//         snippet.tags,
+//         id,
+//       ]
+//     );
+
+//     return true;
+//   } catch (error) {
+//     console.log(error);
+//     return false;
+//   }
+// };
 export const updateSnippet = (
   id: number,
   snippet: Snippet
@@ -167,7 +213,8 @@ export const updateSnippet = (
         title = ?,
         code = ?,
         language = ?,
-        tags = ?
+        tags = ?,
+        favorite = ?
       WHERE id = ?
       `,
       [
@@ -175,6 +222,7 @@ export const updateSnippet = (
         snippet.code,
         snippet.language,
         snippet.tags,
+        snippet.favorite,
         id,
       ]
     );

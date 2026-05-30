@@ -5,20 +5,38 @@ import {
 } from "react-native";
 
 import {
-  useSnippetStore,
-} from "../store/snippetStore";
+  useFocusEffect,
+} from "expo-router";
+
+import {
+  useCallback,
+  useState,
+} from "react";
+
+import {
+  getFavoriteSnippets,
+} from "../database/snippetService";
+
+import { Snippet } from "../types/snippet";
 
 import SnippetCard from "../components/SnippetCard";
 
 export default function FavoritesScreen() {
-  const { snippets } =
-    useSnippetStore();
+  const [snippets, setSnippets] =
+    useState<Snippet[]>([]);
 
-  const favorites =
-    snippets.filter(
-      (item) =>
-        item.favorite === 1
-    );
+  const loadFavorites = () => {
+    const data =
+      getFavoriteSnippets();
+
+    setSnippets(data);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadFavorites();
+    }, [])
+  );
 
   return (
     <View
@@ -27,19 +45,15 @@ export default function FavoritesScreen() {
         padding: 20,
       }}
     >
-      <Text
-        style={{
-          fontSize: 24,
-          fontWeight: "bold",
-        }}
-      >
-        Favorites
-      </Text>
-
       <FlatList
-        data={favorites}
+        data={snippets}
         keyExtractor={(item) =>
           item.id!.toString()
+        }
+        ListEmptyComponent={
+          <Text>
+            No Favorites Yet
+          </Text>
         }
         renderItem={({ item }) => (
           <SnippetCard

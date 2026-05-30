@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -9,10 +9,24 @@ import {
 import * as SecureStore from "expo-secure-store";
 
 export default function SettingsScreen() {
-  const [apiKey, setApiKey] =
-    useState("");
+  const [apiKey, setApiKey] = useState("");
 
-  const saveApiKey = async () => {
+  useEffect(() => {
+    loadKey();
+  }, []);
+
+  const loadKey = async () => {
+    const saved =
+      await SecureStore.getItemAsync(
+        "OPENROUTER_API_KEY"
+      );
+
+    if (saved) {
+      setApiKey(saved);
+    }
+  };
+
+  const saveKey = async () => {
     await SecureStore.setItemAsync(
       "OPENROUTER_API_KEY",
       apiKey
@@ -32,15 +46,20 @@ export default function SettingsScreen() {
       }}
     >
       <TextInput
-        placeholder="OpenRouter API Key"
         value={apiKey}
         onChangeText={setApiKey}
-        secureTextEntry
+        placeholder="Enter OpenRouter API Key"
+        autoCapitalize="none"
+        style={{
+          borderWidth: 1,
+          padding: 10,
+          marginBottom: 20,
+        }}
       />
 
       <Button
         title="Save API Key"
-        onPress={saveApiKey}
+        onPress={saveKey}
       />
     </View>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import {
   View,
   TextInput,
@@ -16,8 +17,13 @@ import {
   updateSnippet,
 } from "../../database/snippetService";
 
+import { Snippet } from "../../types/snippet";
+
 export default function EditScreen() {
   const { id } = useLocalSearchParams();
+
+  const [snippet, setSnippet] =
+    useState<Snippet | null>(null);
 
   const [title, setTitle] =
     useState("");
@@ -29,28 +35,30 @@ export default function EditScreen() {
     useState("");
 
   useEffect(() => {
-    const snippet =
+    const data =
       getSnippetById(Number(id));
 
-    if (snippet) {
-      setTitle(snippet.title);
-      setCode(snippet.code);
-      setLanguage(
-        snippet.language
-      );
+    if (data) {
+      setSnippet(data);
+
+      setTitle(data.title);
+      setCode(data.code);
+      setLanguage(data.language);
     }
-  }, []);
+  }, [id]);
 
   const saveChanges = () => {
-    updateSnippet(Number(id), {
-      title,
-      code,
-      language,
-      tags: "",
-      favorite: 0,
-      createdAt:
-        new Date().toISOString(),
-    });
+    if (!snippet) return;
+
+    updateSnippet(
+      Number(id),
+      {
+        ...snippet,
+        title,
+        code,
+        language,
+      }
+    );
 
     Alert.alert(
       "Success",
@@ -71,12 +79,22 @@ export default function EditScreen() {
         value={title}
         onChangeText={setTitle}
         placeholder="Title"
+        style={{
+          borderWidth: 1,
+          padding: 10,
+          marginBottom: 10,
+        }}
       />
 
       <TextInput
         value={language}
         onChangeText={setLanguage}
         placeholder="Language"
+        style={{
+          borderWidth: 1,
+          padding: 10,
+          marginBottom: 10,
+        }}
       />
 
       <TextInput
@@ -84,10 +102,17 @@ export default function EditScreen() {
         onChangeText={setCode}
         multiline
         placeholder="Code"
+        style={{
+          borderWidth: 1,
+          padding: 10,
+          minHeight: 200,
+          textAlignVertical: "top",
+          marginBottom: 20,
+        }}
       />
 
       <Button
-        title="Update"
+        title="Update Snippet"
         onPress={saveChanges}
       />
     </View>
